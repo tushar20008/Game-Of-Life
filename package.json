@@ -8,6 +8,9 @@
   },
   "author": "Tushar Anand",
   "license": "ISC",
+  "engines": {
+    "node": "8.11.1"
+  },
   "dependencies": {
     "express": "*",
     "socket.io": "*",
