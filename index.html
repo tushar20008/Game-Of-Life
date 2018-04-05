@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Game of Life</title>
+        <style type="text/css">
+            td{
+                height: 20px;
+                width: 20px;
+            }
+            tr,td{
+                border: solid 1px;
+            }
+        </style>
+    </head>
+ 
+    <body>
+        <h1>Real-time Game of Life !</h1>
+
+        <table id="board"></table>
+        <br/>
+        <button id="block" class="createPattern" type="button"> Create Block </button>
+        <button id="tub" class="createPattern" type="button"> Create Tub </button>
+        <button id="blinker" class="createPattern" type="button"> Create Blinker </button>
+
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            // Creating Table
+            var row = 15, col = 15;
+            var tableHtml = '';
+            for(var i=0; i<row; i++){
+                tableHtml += '<tr id=row'+i+'>';
+                for(var j=0; j<col; j++){
+                    tableHtml += '<td class=createCell id=col'+j+'></td>';
+                }
+                tableHtml += '/<tr>';
+            }    
+            $('#board').append(tableHtml);
+            
+            // Connecting to socket.io
+            var socket = io.connect('http://localhost:8080');
+
+            // Random color for user
+            function getRandomColor() {
+                var r = Math.floor(Math.random() * 200);
+                var g = Math.floor(Math.random() * 200);
+                var b = Math.floor(Math.random() * 200);
+                var color = "rgb(" + r + "," + g + "," + b + ")";
+                return color;
+            }
+
+            var randomColor = getRandomColor();
+            socket.emit('new_client', randomColor);
+
+            socket.on('updateCell', function(data) {
+                updateCell(data)
+            });
+
+            function updateCell(data){
+                for(var i = 0; i < data.length; i++) {
+                    for(var j = 0; j < data[i].length; j++) {
+                        $('#row'+i+' #col'+j).css("background-color", data[i][j]);
+                    }
+                }
+            }
+
+            socket.on('createCell', function(data) {
+                createCell(data.cellInfo, data.color)
+            });
+
+            function createCell(cellInfo, color){
+                $('#row'+cellInfo[0]+' #col'+cellInfo[1]).css("background-color", color);
+            }
+
+            $(".createCell").click(function() {
+                var cellInfo = [
+                                $(this).parent().attr('id').substring(3),
+                                $(this).attr('id').substring(3)
+                            ];
+                console.log(cellInfo);
+                socket.emit('createCell', cellInfo);
+            });
+
+            $(".createPattern").click(function() {
+                var patternName = $(this).attr('id');
+                socket.emit('createPattern', patternName);
+            });
+
+        </script>
+    </body>
+</html>
