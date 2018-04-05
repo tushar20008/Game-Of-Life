@@ -17,8 +17,8 @@ At each step in time, the following transitions occur:
 
 ## How to run
 - Clone or download Repository
-- Run npm install
-- Run node index.js
+- Run "npm install" and "node index.js" in the project directory (inside Game-Of-Life folder)
+- Open "http://localhost:8080"
 
 ## Algorithm Implementation
 At each step, the game calculates the status of next generation for each cell. This is done using a naiive algorithm which would check each and every cell on step for a time complexity of O(M*N).
